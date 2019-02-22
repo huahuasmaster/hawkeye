@@ -24,6 +24,7 @@ public class OkHttpClientWrapper {
 
     private static final String HTTP_PREFIX = "http://";
 
+    // 线程安全的饿汉模式
     static  {
         okHttpClient = new OkHttpClient.Builder()
                 .callTimeout(10, TimeUnit.SECONDS)
