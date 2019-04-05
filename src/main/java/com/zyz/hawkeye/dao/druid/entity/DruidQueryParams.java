@@ -1,4 +1,4 @@
-package com.zyz.hawkeye.dao.druid;
+package com.zyz.hawkeye.dao.druid.entity;
 
 import com.google.common.collect.Lists;
 import in.zapr.druid.druidry.Context;
