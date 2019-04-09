@@ -2,6 +2,7 @@ package com.zyz.hawkeye.config;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.KafkaAdminClient;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,4 +21,5 @@ public class KafkaConfig {
         properties.put("bootstrap.servers", kafkaServer);
         return KafkaAdminClient.create(properties);
     }
+
 }

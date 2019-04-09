@@ -14,7 +14,7 @@ import java.util.List;
 public class DruidDataSource {
 
 
-    private String type = "index";
+    private String type = "index_kafka";
     private DataSchemaBean dataSchema; // 指明数据源格式、数据解析、维度等信息
     private TuningConfigBean tuningConfig;// 存储优化方式
     private IoConfigBean ioConfig;// 数据如何在Druid中存储
@@ -100,6 +100,9 @@ public class DruidDataSource {
             private String fieldName; // 聚合运用的列名
             private Object expression;
             private Boolean isInputHyperUnique;
+
+            public MetricsSpecBean() {
+            }
 
             public MetricsSpecBean(String type, String name, String fieldName) {
                 this.type = type;

@@ -47,4 +47,18 @@ public class DruidQueryParams {
 
     // 额外的一些参数，比如超时时间，查询优先级是否使用缓存等，详见 http://druid.io/docs/latest/querying/query-context.html
     private Context context;
+
+    private Having having;
+
+
+    @Data
+    public static class Having {
+        private String type;
+        private DruidFilter filter;
+
+        public Having(DruidFilter filter) {
+            this.filter = filter;
+            this.type = "filter";
+        }
+    }
 }
