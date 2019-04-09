@@ -43,14 +43,14 @@ public class DruidDAOTest {
         params.setDataSource("hawkeye_mysql_t_order");
         DateTime dateTime = new DateTime();
         params.setIntervals(Collections.singletonList(new Interval(dateTime.plusDays(-1), dateTime)));
-        params.setGranularity(GranularityOptions.fromType("1天").getGranularity());
+        params.setGranularity(GranularityOptions.fromType("1小时").getGranularity());
         params.setAggregations(
-                Collections.singletonList(new CountAggregator("count"))
+                Collections.singletonList(MetricAggregationType.COUNT.getAggregation(null, "count"))
         );
         List<DruidQueryResult> result = druidDAO.query(params);
         Assert.assertNotNull(result);
         Assert.assertTrue(result.size() >= 1);
-        log.info(JSON.toJSONString(result.get(0)));
+        result.forEach(r -> log.info(JSON.toJSONString(r)));
     }
 
     @Test

@@ -4,6 +4,9 @@ import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +18,6 @@ import java.util.Map;
 @NoArgsConstructor
 public class DruidQueryResult {
 
-    @JSONField(name = "_time")
     DateTime timestamp;
     List<Map<String, Object>> result;
 
@@ -25,7 +27,9 @@ public class DruidQueryResult {
     }
 
     public void setTimestamp(String timestamp) {
-        this.timestamp = DateTime.parse(timestamp);
+        System.out.println(timestamp);
+        this.timestamp = new DateTime(timestamp);
+//        this.timestamp = DateTime.parse(timestamp, DateTimeFormat.forPattern("yyyy-MM-ddTHH:mm:ss.sssz"));
     }
 
     public DruidQueryResult(DateTime timestamp, List<Map<String, Object>> result) {

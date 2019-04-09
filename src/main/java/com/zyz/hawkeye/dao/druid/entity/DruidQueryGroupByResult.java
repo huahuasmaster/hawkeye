@@ -11,7 +11,6 @@ import java.util.Map;
  */
 @Data
 public class DruidQueryGroupByResult {
-    @JSONField(name = "_time")
     DateTime timestamp;
 
     Map<String, Object> event;

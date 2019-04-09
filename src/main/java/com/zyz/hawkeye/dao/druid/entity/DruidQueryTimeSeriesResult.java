@@ -12,7 +12,6 @@ import java.util.Map;
 @Data
 public class DruidQueryTimeSeriesResult {
 
-    @JSONField(name = "_time")
     DateTime timestamp;
 
     Map<String, Object> result;
