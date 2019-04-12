@@ -14,7 +14,7 @@ import java.util.List;
 public class DruidDataSource {
 
 
-    private String type = "index_kafka";
+    private String type = "kafka";
     private DataSchemaBean dataSchema; // 指明数据源格式、数据解析、维度等信息
     private TuningConfigBean tuningConfig;// 存储优化方式
     private IoConfigBean ioConfig;// 数据如何在Druid中存储
@@ -38,7 +38,7 @@ public class DruidDataSource {
         @Builder
         public static class ParserBean {
 
-            private String type;
+            private String type = "string";
             private ParseSpecBean parseSpec;
 
 
@@ -53,7 +53,7 @@ public class DruidDataSource {
                 @AllArgsConstructor
                 public static class TimestampSpecBean {
                     private String column;// 指定为时间戳的列
-                    private String format;// 格式{iso,lills,auto,Joda,posix}
+                    private String format;// 格式{iso,millis,auto,Joda,posix}
                 }
 
                 @Data
@@ -75,11 +75,11 @@ public class DruidDataSource {
             private String type = "uniform";
             // 数据分片粒度
             private String segmentGranularity;
-            // 查询粒度
+            // 查询粒度, 在预聚合开启的时候会生效
             private String queryGranularity;
             // 是否进行预聚合
             private boolean rollup;
-            // 时间间隔，仅仅用于批处理
+            // 时间间隔，仅仅用于批处理,可选
             private Object intervals;
 
 
@@ -122,8 +122,8 @@ public class DruidDataSource {
 
 
         private String type;
-        private int maxRowsInMemory;
-        private int maxRowsPerSegment;
+        private int maxRowsInMemory = 1000000;
+        private int maxRowsPerSegment = 5000000;
         private String intermediatePersistPeriod;
         private String basePersistDirectory;
         private int maxPendingPersists;
@@ -164,8 +164,8 @@ public class DruidDataSource {
     public static class IoConfigBean {
 
         private String topic;
-        private int replicas;
-        private int taskCount;
+        private int replicas = 1;
+        private int taskCount = 1;
         private String taskDuration;
         private ConsumerPropertiesBean consumerProperties;
         private String startDelay;
