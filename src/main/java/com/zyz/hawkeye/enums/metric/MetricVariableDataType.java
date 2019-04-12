@@ -62,9 +62,9 @@ public enum MetricVariableDataType {
         }
     },;
 
-    public static final String MAX = "Max";
-    public static final String MIN = "Min";
-    public static final String SUM = "Sum";
+    public static final String MAX = "";
+    public static final String MIN = "";
+    public static final String SUM = "";
     @Getter
     private final String name;
     @Getter

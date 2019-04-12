@@ -5,9 +5,11 @@ import com.zyz.hawkeye.dao.druid.entity.DruidQueryParams;
 import com.zyz.hawkeye.dao.druid.entity.DruidQueryResult;
 import com.zyz.hawkeye.enums.metric.GranularityOptions;
 import com.zyz.hawkeye.enums.metric.MetricAggregationType;
+import com.zyz.hawkeye.enums.metric.MetricVariableDataType;
 import com.zyz.hawkeye.http.metric.MetricParamChartVO;
 import com.zyz.hawkeye.http.metric.MetricQueryParamRawVO;
 import com.zyz.hawkeye.http.metric.MetricResultVO;
+import com.zyz.hawkeye.http.metric.MetricVariableVO;
 import in.zapr.druid.druidry.Interval;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +39,19 @@ public class ChartService {
                 .collect(Collectors.toList());
         params.setIntervals(intervals);
         params.setGranularity(GranularityOptions.fromType(metricParamChartVO.getPeriod()).getGranularity());
-        params.setAggregations(
-                Collections.singletonList(MetricAggregationType.COUNT.getAggregation(null, "count"))
-        );
+
+        if (metricParamChartVO.getChartId() == 1) {
+            params.setAggregations(
+                    Collections.singletonList(MetricAggregationType.COUNT.getAggregation(null, "count"))
+            );
+        } else {
+            MetricVariableVO.Variable v = new MetricVariableVO.Variable();
+            v.setQueryName("amount_sum");// 在此处是用于查询的字段名,另一个才是查询出的结果的别名
+            v.setDataType(MetricVariableDataType.DOUBLE);
+            params.setAggregations(
+                    Collections.singletonList(MetricAggregationType.SUM.getAggregation(v, "amount_sum"))
+            );
+        }
         // 3查询得到结果
         List<DruidQueryResult> results = druidDAO.query(params);
         // 4转换结果为VO
