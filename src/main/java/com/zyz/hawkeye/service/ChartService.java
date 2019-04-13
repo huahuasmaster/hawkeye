@@ -6,10 +6,7 @@ import com.zyz.hawkeye.dao.druid.entity.DruidQueryResult;
 import com.zyz.hawkeye.enums.metric.GranularityOptions;
 import com.zyz.hawkeye.enums.metric.MetricAggregationType;
 import com.zyz.hawkeye.enums.metric.MetricVariableDataType;
-import com.zyz.hawkeye.http.metric.MetricParamChartVO;
-import com.zyz.hawkeye.http.metric.MetricQueryParamRawVO;
-import com.zyz.hawkeye.http.metric.MetricResultVO;
-import com.zyz.hawkeye.http.metric.MetricVariableVO;
+import com.zyz.hawkeye.http.metric.*;
 import in.zapr.druid.druidry.Interval;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +25,10 @@ public class ChartService {
 
     @Autowired
     private DruidDAO druidDAO;
+
+    public int save(ChartVO chartVO) {
+        return 0;
+    }
 
     public MetricResultVO getMetricResultByChart(MetricParamChartVO metricParamChartVO) {
         // 1查询并检验图表

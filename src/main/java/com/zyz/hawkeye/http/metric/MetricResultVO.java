@@ -20,7 +20,7 @@ public class MetricResultVO {
     private List<Result> metricList;
 
     @ApiModelProperty("图表信息")
-    MetricChartVO chartVO;
+    ChartVO chartVO;
 
     @Data
     @AllArgsConstructor
