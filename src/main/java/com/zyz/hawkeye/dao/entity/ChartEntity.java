@@ -7,14 +7,15 @@ import java.util.Objects;
 @Table(name = "t_chart", schema = "hawkeye", catalog = "")
 public class ChartEntity {
     private int id;
+    private Integer datasourceId;
     private String name;
     private String desc;
-    private String metricQueryType;
     private String type;
     private String aggregations;
     private String dimensions;
     private String filters;
     private String config;
+    private String defaultGranularity;
 
     @Id
     @Column(name = "id")
@@ -24,6 +25,16 @@ public class ChartEntity {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    @Basic
+    @Column(name = "datasource_id")
+    public Integer getDatasourceId() {
+        return datasourceId;
+    }
+
+    public void setDatasourceId(Integer datasourceId) {
+        this.datasourceId = datasourceId;
     }
 
     @Basic
@@ -44,16 +55,6 @@ public class ChartEntity {
 
     public void setDesc(String desc) {
         this.desc = desc;
-    }
-
-    @Basic
-    @Column(name = "metric_query_type")
-    public String getMetricQueryType() {
-        return metricQueryType;
-    }
-
-    public void setMetricQueryType(String metricQueryType) {
-        this.metricQueryType = metricQueryType;
     }
 
     @Basic
@@ -112,9 +113,9 @@ public class ChartEntity {
         if (o == null || getClass() != o.getClass()) return false;
         ChartEntity that = (ChartEntity) o;
         return id == that.id &&
+                Objects.equals(datasourceId, that.datasourceId) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(desc, that.desc) &&
-                Objects.equals(metricQueryType, that.metricQueryType) &&
                 Objects.equals(type, that.type) &&
                 Objects.equals(aggregations, that.aggregations) &&
                 Objects.equals(dimensions, that.dimensions) &&
@@ -124,6 +125,16 @@ public class ChartEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, desc, metricQueryType, type, aggregations, dimensions, filters, config);
+        return Objects.hash(id, datasourceId, name, desc, type, aggregations, dimensions, filters, config);
+    }
+
+    @Basic
+    @Column(name = "default_granularity")
+    public String getDefaultGranularity() {
+        return defaultGranularity;
+    }
+
+    public void setDefaultGranularity(String defaultGranularity) {
+        this.defaultGranularity = defaultGranularity;
     }
 }

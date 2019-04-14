@@ -119,6 +119,8 @@ public class MetricQueryParamRawVO {
     }
 
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Interval {
 

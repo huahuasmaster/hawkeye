@@ -1,11 +1,7 @@
 package com.zyz.hawkeye.config;
 
-import com.alibaba.fastjson.JSON;
 import com.zyz.hawkeye.dao.druid.entity.DruidDataSource;
-import com.zyz.hawkeye.enums.metric.DataSourceType;
-import com.zyz.hawkeye.http.BuryInfo;
 import com.zyz.hawkeye.http.DataSourceVO;
-import com.zyz.hawkeye.http.MysqlInfo;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -38,7 +34,7 @@ public class KafkaDruidDataSourceTemplate {
 
         // DataSchemaBean
         DruidDataSource.DataSchemaBean dataSchemaBean = DruidDataSource.DataSchemaBean.builder()
-                .dataSource(getTopic(dataSourceVO))
+                .dataSource(dataSourceVO.getName())
                 .granularitySpec(
                         DruidDataSource.DataSchemaBean.GranularitySpecBean.builder()
                                 .queryGranularity(dataSourceVO.getQueryGranularity())
@@ -58,7 +54,7 @@ public class KafkaDruidDataSourceTemplate {
 
         // IoConfigBean
         DruidDataSource.IoConfigBean ioConfigBean = DruidDataSource.IoConfigBean.builder()
-                .topic(getTopic(dataSourceVO))
+                .topic(dataSourceVO.getName())
                 .consumerProperties(new DruidDataSource.IoConfigBean.ConsumerPropertiesBean("192.168.1.101:9092"))
                 .taskCount(1)
                 .replicas(1)
@@ -78,13 +74,5 @@ public class KafkaDruidDataSourceTemplate {
                 .build();
     }
 
-    private static String getTopic(DataSourceVO dataSourceVO) {
-        String suffix;
-        switch (DataSourceType.fromType(dataSourceVO.getType())) {
-            case MYSQL: suffix = JSON.parseObject(dataSourceVO.getSourceInfo(), MysqlInfo.class).getTable();break;
-            case BURY: suffix = JSON.parseObject(dataSourceVO.getSourceInfo(), BuryInfo.class).getEvent();break;
-            default: suffix = "";
-        }
-        return "hawkeye_" + dataSourceVO.getType().toLowerCase() + "_" + suffix;
-    }
+
 }

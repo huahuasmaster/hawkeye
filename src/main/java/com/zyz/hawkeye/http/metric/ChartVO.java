@@ -27,7 +27,7 @@ public class ChartVO {
 
     @NotNull
     @ApiModelProperty("图表类型")
-    private String chartType;
+    private String type;
 
     @NotNull
     @ApiModelProperty("查询类型")

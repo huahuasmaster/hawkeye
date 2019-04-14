@@ -1,22 +1,28 @@
 package com.zyz.hawkeye.service;
 
+import com.alibaba.fastjson.JSON;
+import com.zyz.hawkeye.dao.ChartRepository;
+import com.zyz.hawkeye.dao.DatasourceRepository;
 import com.zyz.hawkeye.dao.druid.DruidDAO;
 import com.zyz.hawkeye.dao.druid.entity.DruidQueryParams;
 import com.zyz.hawkeye.dao.druid.entity.DruidQueryResult;
+import com.zyz.hawkeye.dao.entity.ChartEntity;
+import com.zyz.hawkeye.dao.entity.DatasourceEntity;
 import com.zyz.hawkeye.enums.metric.GranularityOptions;
 import com.zyz.hawkeye.enums.metric.MetricAggregationType;
 import com.zyz.hawkeye.enums.metric.MetricVariableDataType;
+import com.zyz.hawkeye.enums.metric.MetricVariableType;
+import com.zyz.hawkeye.exception.HawkEyeException;
 import com.zyz.hawkeye.http.metric.*;
 import in.zapr.druid.druidry.Interval;
+import in.zapr.druid.druidry.aggregator.DruidAggregator;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -26,35 +32,72 @@ public class ChartService {
     @Autowired
     private DruidDAO druidDAO;
 
+    @Autowired
+    private ChartRepository chartRepository;
+
+    @Autowired
+    private DatasourceRepository datasourceRepository;
+
     public int save(ChartVO chartVO) {
         return 0;
     }
 
+    public Optional<ChartEntity> get(Integer id) {
+        return chartRepository.findById(id);
+    }
+
     public MetricResultVO getMetricResultByChart(MetricParamChartVO metricParamChartVO) {
         // 1查询并检验图表
+        ChartEntity chartEntity = get(metricParamChartVO.getChartId())
+                .orElseThrow(() -> new HawkEyeException("图表不存在或者已经被删除"));
+
+
         // 2根据图表配置生成查询参数
+        DatasourceEntity datasourceEntity = datasourceRepository.findById(chartEntity.getDatasourceId())
+                .orElseThrow(() -> new HawkEyeException("数据源不存在或者已经被关闭"));
+
+
         DruidQueryParams params = new DruidQueryParams();
-        params.setDataSource("hawkeye_mysql_t_order");
+        params.setDataSource(datasourceEntity.getName());
         List<Interval> intervals = metricParamChartVO.getIntervals().stream()
                 .map(i -> new Interval(new DateTime(i.getStartTime()), new DateTime(i.getEndTime())))
                 .collect(Collectors.toList());
         params.setIntervals(intervals);
-        params.setGranularity(GranularityOptions.fromType(metricParamChartVO.getPeriod()).getGranularity());
 
-        if (metricParamChartVO.getChartId() == 1) {
-            params.setAggregations(
-                    Collections.singletonList(MetricAggregationType.COUNT.getAggregation(null, "count"))
+        params.setGranularity(GranularityOptions.fromType(
+                StringUtils.isEmpty(metricParamChartVO.getPeriod()) ? chartEntity.getDefaultGranularity() : metricParamChartVO.getPeriod()
+        ).getGranularity());
+
+        // 产生聚合器char
+        List<MetricQueryParamRawVO.Aggregation> aggregations = JSON.parseArray(chartEntity.getAggregations(), MetricQueryParamRawVO.Aggregation.class);
+        List<DruidAggregator> finalAggregators = new ArrayList<>();
+        aggregations.forEach((aggregation -> {
+            // 此处的Variable是虚构的
+            MetricVariableVO.Variable variable = new MetricVariableVO.Variable();
+            variable.setQueryName(aggregation.getMetric()); // 在此处是用于查询的字段名,另一个才是查询出的结果的别名
+            variable.setVariableType(MetricVariableType.METRIC);
+            variable.setDataType(MetricVariableDataType.DOUBLE);
+            finalAggregators.add(
+                    aggregation.getMetricAggregationType().getAggregation(variable, aggregation.getAlias())
             );
-        } else {
-            MetricVariableVO.Variable v = new MetricVariableVO.Variable();
-            v.setQueryName("amount_sum");// 在此处是用于查询的字段名,另一个才是查询出的结果的别名
-            v.setDataType(MetricVariableDataType.DOUBLE);
-            params.setAggregations(
-                    Collections.singletonList(MetricAggregationType.SUM.getAggregation(v, "amount_sum"))
-            );
-        }
+        }));
+        params.setAggregations(finalAggregators);
+//        if (metricParamChartVO.getChartId() == 1) {
+//            params.setAggregations(
+//                    Collections.singletonList(MetricAggregationType.COUNT.getAggregation(null, "count"))
+//            );
+//        } else {
+//            MetricVariableVO.Variable v = new MetricVariableVO.Variable();
+//            v.setQueryName("amount_sum");// 在此处是用于查询的字段名,另一个才是查询出的结果的别名
+//            v.setDataType(MetricVariableDataType.DOUBLE);
+//            params.setAggregations(
+//                    Collections.singletonList(MetricAggregationType.SUM.getAggregation(v, "amount_sum"))
+//            );
+//        }
+
         // 3查询得到结果
         List<DruidQueryResult> results = druidDAO.query(params);
+
         // 4转换结果为VO
         MetricResultVO resultVO = new MetricResultVO();
         List<MetricResultVO.Result> resultVOs = results.stream()
@@ -67,6 +110,8 @@ public class ChartService {
         return resultVO;
 
     }
+
+
 
     private List<MetricResultVO.Result> makeUp(
             List<MetricResultVO.Result> results,
@@ -103,4 +148,6 @@ public class ChartService {
         }
 
     }
+
+
 }

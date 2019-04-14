@@ -13,31 +13,31 @@ import lombok.Getter;
 public enum MetricAggregationType {
 
 
-    MAX("max(%s)", "最大值") {
+    MAX("max", "最大值") {
         @Override
         public DruidAggregator getAggregation(MetricVariableVO.Variable variable, String name) {
             return variable.getDataType().getMaxAggregator(name, variable.getQueryName());
         }
     },
-    MIN("min(%s)", "最小值") {
+    MIN("min", "最小值") {
         @Override
         public DruidAggregator getAggregation(MetricVariableVO.Variable variable, String name) {
             return variable.getDataType().getMinAggregator(name, variable.getQueryName());
         }
     },
-    SUM("sum(%s)", "总和") {
+    SUM("sum", "总和") {
         @Override
         public DruidAggregator getAggregation(MetricVariableVO.Variable variable, String name) {
             return variable.getDataType().getSumAggregator(name, variable.getQueryName());
         }
     },
-    DISTINCT("count(distinct %s)", "去重") {
+    DISTINCT("distinct", "去重") {
         @Override
         public DruidAggregator getAggregation(MetricVariableVO.Variable variable, String name) {
             return new HyperUniqueAggregatorNew(name, variable.getQueryName(), true);
         }
     },
-    COUNT("count(%s)", "计数") {
+    COUNT("count", "计数") {
         @Override
         public DruidAggregator getAggregation(MetricVariableVO.Variable variable, String name) {
             return new LongSumAggregator(name, "count");
@@ -52,6 +52,15 @@ public enum MetricAggregationType {
     MetricAggregationType(String expr, String desc) {
         this.expr = expr;
         this.desc = desc;
+    }
+
+    public static MetricAggregationType fromExpr(String expr) {
+        for (MetricAggregationType type : MetricAggregationType.values()) {
+            if (type.getExpr().equals(expr)) {
+                return type;
+            }
+        }
+        throw new UnsupportedOperationException("【MetricAggregationType】不支持type:" + expr);
     }
 
     public abstract DruidAggregator getAggregation(MetricVariableVO.Variable variableVO, String name);
