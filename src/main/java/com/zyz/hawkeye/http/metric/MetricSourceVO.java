@@ -2,7 +2,7 @@ package com.zyz.hawkeye.http.metric;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.zyz.hawkeye.enums.metric.MetricQueryGranularity;
-import com.zyz.hawkeye.http.DataSourceVO;
+import com.zyz.hawkeye.http.DatasourceVO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -27,7 +27,7 @@ public class MetricSourceVO{
 
 
     @ApiModelProperty(value = "数据源信息", hidden = true)
-    private DataSourceVO dataSourceVO;
+    private DatasourceVO dataSourceVO;
 
     @ApiModelProperty(value = "数据源Samples信息", hidden = true)
     private List<String> samples;

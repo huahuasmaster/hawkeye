@@ -38,7 +38,7 @@ public class BinlogService {
                         log.info("解析binlog为java类失败");
                         return;
                     }
-                    log.info("解析成功:{}", JSON.toJSONString(dto));
+                    log.info("解析为java类成功:{}", JSON.toJSONString(dto));
                     druidService.compute(dto);
                 });
             }

@@ -17,6 +17,7 @@ import com.zyz.hawkeye.http.metric.*;
 import in.zapr.druid.druidry.Interval;
 import in.zapr.druid.druidry.aggregator.DruidAggregator;
 import org.joda.time.DateTime;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -42,13 +43,21 @@ public class ChartService {
         return 0;
     }
 
-    public Optional<ChartEntity> get(Integer id) {
-        return chartRepository.findById(id);
+    public List<ChartVO> listByDashboardId(Integer dashboardId) {
+        List<ChartVO> result = new ArrayList<>();
+        List<ChartEntity> entities = chartRepository.findAll();
+        if (CollectionUtils.isEmpty(entities)) {
+            return result;
+//            throw new HawkEyeException("该看板下没有表格");
+        }
+        entities.forEach(entity -> result.add(entity2VO(entity)));
+        return result;
     }
 
     public MetricResultVO getMetricResultByChart(MetricParamChartVO metricParamChartVO) {
+
         // 1查询并检验图表
-        ChartEntity chartEntity = get(metricParamChartVO.getChartId())
+        ChartEntity chartEntity = chartRepository.findById(metricParamChartVO.getChartId())
                 .orElseThrow(() -> new HawkEyeException("图表不存在或者已经被删除"));
 
 
@@ -149,5 +158,13 @@ public class ChartService {
 
     }
 
+    private ChartVO entity2VO(ChartEntity chartEntity) {
+        ChartVO chartVO = new ChartVO();
+        BeanUtils.copyProperties(chartEntity, chartVO);
+        chartVO.setAggregations(JSON.parseArray(chartEntity.getAggregations(), MetricQueryParamRawVO.Aggregation.class));
+        chartVO.setDimensions(JSON.parseArray(chartEntity.getDimensions(), MetricQueryParamRawVO.Dimension.class));
+        chartVO.setFilters(JSON.parseArray(chartEntity.getFilters(), MetricQueryParamRawVO.Filter.class));
+        return chartVO;
+    }
 
 }

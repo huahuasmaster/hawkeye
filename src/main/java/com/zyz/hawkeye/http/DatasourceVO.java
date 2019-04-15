@@ -1,6 +1,7 @@
 package com.zyz.hawkeye.http;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.zyz.hawkeye.dao.druid.entity.DruidDataSource;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -17,7 +18,7 @@ import java.util.List;
 @Data
 @ApiModel("数据源信息")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DataSourceVO {
+public class DatasourceVO {
 
     private Integer id;
 
@@ -59,6 +60,7 @@ public class DataSourceVO {
     private List<String> dimensionList;
 
     @ApiModelProperty("指标列表")
+//    private List<DruidDataSource.DataSchemaBean.MetricsSpecBean> metricList;
     private List<String> metricList;
 
     @ApiModelProperty("数据源样例")

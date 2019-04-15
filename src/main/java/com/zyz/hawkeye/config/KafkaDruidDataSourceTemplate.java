@@ -1,14 +1,14 @@
 package com.zyz.hawkeye.config;
 
 import com.zyz.hawkeye.dao.druid.entity.DruidDataSource;
-import com.zyz.hawkeye.http.DataSourceVO;
+import com.zyz.hawkeye.http.DatasourceVO;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class KafkaDruidDataSourceTemplate {
-    public static DruidDataSource newInstance(DataSourceVO dataSourceVO) {
+    public static DruidDataSource newInstance(DatasourceVO dataSourceVO) {
         // ParseSpecBean
         DruidDataSource.DataSchemaBean.ParserBean.ParseSpecBean parserSpecBean = new DruidDataSource.DataSchemaBean.ParserBean.ParseSpecBean();
         parserSpecBean.setFormat("json");

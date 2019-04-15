@@ -25,13 +25,11 @@ public class ChartVO {
     @ApiModelProperty("图表名")
     private String name;
 
+    private String desc;
+
     @NotNull
     @ApiModelProperty("图表类型")
     private String type;
-
-    @NotNull
-    @ApiModelProperty("查询类型")
-    private MetricQueryType metricQueryType;
 
     @NotNull
     @ApiModelProperty("聚合条件")

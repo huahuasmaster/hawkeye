@@ -32,4 +32,9 @@ public class ChartServiceTest {
         MetricResultVO resultVO = chartService.getMetricResultByChart(metricParamChartVO);
         log.info(JSON.toJSONString(resultVO));
     }
+
+    @Test
+    public void list() {
+        log.info(JSON.toJSONString(chartService.listByDashboardId(1)));
+    }
 }

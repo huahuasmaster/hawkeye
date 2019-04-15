@@ -97,7 +97,7 @@ public class DruidDataSource {
         public static class MetricsSpecBean {
             private String type;// 聚合类型
             private String name;// 聚合后，存于druid的指标列名
-            private String fieldName; // 聚合运用的列名
+            private String fieldName; // 聚合运用的初始列名
             private Object expression;
             private Boolean isInputHyperUnique;
 
