@@ -9,7 +9,7 @@ public class ChartEntity {
     private int id;
     private Integer datasourceId;
     private String name;
-    private String desc;
+    private String chartDesc;
     private String type;
     private String aggregations;
     private String dimensions;
@@ -48,13 +48,13 @@ public class ChartEntity {
     }
 
     @Basic
-    @Column(name = "desc")
-    public String getDesc() {
-        return desc;
+    @Column(name = "chart_desc")
+    public String getChartDesc() {
+        return chartDesc;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setChartDesc(String chartDesc) {
+        this.chartDesc = chartDesc;
     }
 
     @Basic
@@ -107,27 +107,6 @@ public class ChartEntity {
         this.config = config;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ChartEntity that = (ChartEntity) o;
-        return id == that.id &&
-                Objects.equals(datasourceId, that.datasourceId) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(desc, that.desc) &&
-                Objects.equals(type, that.type) &&
-                Objects.equals(aggregations, that.aggregations) &&
-                Objects.equals(dimensions, that.dimensions) &&
-                Objects.equals(filters, that.filters) &&
-                Objects.equals(config, that.config);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, datasourceId, name, desc, type, aggregations, dimensions, filters, config);
-    }
-
     @Basic
     @Column(name = "default_granularity")
     public String getDefaultGranularity() {
@@ -136,5 +115,27 @@ public class ChartEntity {
 
     public void setDefaultGranularity(String defaultGranularity) {
         this.defaultGranularity = defaultGranularity;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChartEntity that = (ChartEntity) o;
+        return id == that.id &&
+                Objects.equals(datasourceId, that.datasourceId) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(chartDesc, that.chartDesc) &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(aggregations, that.aggregations) &&
+                Objects.equals(dimensions, that.dimensions) &&
+                Objects.equals(filters, that.filters) &&
+                Objects.equals(config, that.config) &&
+                Objects.equals(defaultGranularity, that.defaultGranularity);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, datasourceId, name, chartDesc, type, aggregations, dimensions, filters, config, defaultGranularity);
     }
 }

@@ -40,7 +40,7 @@ public class ChartService {
     private DatasourceRepository datasourceRepository;
 
     public int save(ChartVO chartVO) {
-        return 0;
+        return chartRepository.save(VO2Entity(chartVO)).getId();
     }
 
     public List<ChartVO> listByDashboardId(Integer dashboardId) {
@@ -164,7 +164,23 @@ public class ChartService {
         chartVO.setAggregations(JSON.parseArray(chartEntity.getAggregations(), MetricQueryParamRawVO.Aggregation.class));
         chartVO.setDimensions(JSON.parseArray(chartEntity.getDimensions(), MetricQueryParamRawVO.Dimension.class));
         chartVO.setFilters(JSON.parseArray(chartEntity.getFilters(), MetricQueryParamRawVO.Filter.class));
+        chartVO.setConfig(JSON.parse(chartEntity.getConfig()));
+        chartVO.setDesc(chartEntity.getChartDesc());
         return chartVO;
+    }
+
+    private ChartEntity VO2Entity(ChartVO chartVO) {
+        ChartEntity chartEntity = new ChartEntity();
+//        chartEntity.setId(chartVO.getId());
+        chartEntity.setName(chartVO.getName());
+        chartEntity.setChartDesc(chartVO.getDesc());
+        chartEntity.setDatasourceId(chartVO.getDatasourceId());
+        chartEntity.setType(chartVO.getType());
+        chartEntity.setConfig(JSON.toJSONString(chartVO.getConfig()));
+        chartEntity.setAggregations(JSON.toJSONString(chartVO.getAggregations()));
+        chartEntity.setDimensions(JSON.toJSONString(chartVO.getDimensions()));
+        chartEntity.setFilters(JSON.toJSONString(chartVO.getFilters()));
+        return chartEntity;
     }
 
 }

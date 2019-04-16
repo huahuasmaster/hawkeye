@@ -1,19 +1,16 @@
 package com.zyz.hawkeye.dao.entity;
 
-import org.hibernate.annotations.Proxy;
-
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
 @Table(name = "t_datasource", schema = "hawkeye", catalog = "")
-@Proxy(lazy = false)
 public class DatasourceEntity {
     private int id;
     private String type;
     private String name;
-    private String desc;
+    private String chartDesc;
     private String config;
     private boolean enable;
     private Timestamp createDate;
@@ -56,13 +53,13 @@ public class DatasourceEntity {
     }
 
     @Basic
-    @Column(name = "desc")
-    public String getDesc() {
-        return desc;
+    @Column(name = "chart_desc")
+    public String getChartDesc() {
+        return chartDesc;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setChartDesc(String chartDesc) {
+        this.chartDesc = chartDesc;
     }
 
     @Basic
@@ -174,7 +171,7 @@ public class DatasourceEntity {
                 enable == that.enable &&
                 Objects.equals(type, that.type) &&
                 Objects.equals(name, that.name) &&
-                Objects.equals(desc, that.desc) &&
+                Objects.equals(chartDesc, that.chartDesc) &&
                 Objects.equals(config, that.config) &&
                 Objects.equals(createDate, that.createDate) &&
                 Objects.equals(queryGranularity, that.queryGranularity) &&
@@ -188,6 +185,6 @@ public class DatasourceEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, name, desc, config, enable, createDate, queryGranularity, fieldList, storageTime, dimensionList, metricList, sample, rollUp);
+        return Objects.hash(id, type, name, chartDesc, config, enable, createDate, queryGranularity, fieldList, storageTime, dimensionList, metricList, sample, rollUp);
     }
 }

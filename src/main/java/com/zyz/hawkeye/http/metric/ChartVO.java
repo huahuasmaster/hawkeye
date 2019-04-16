@@ -27,6 +27,8 @@ public class ChartVO {
 
     private String desc;
 
+    private Integer datasourceId;
+
     @NotNull
     @ApiModelProperty("图表类型")
     private String type;
@@ -42,7 +44,7 @@ public class ChartVO {
     private List<MetricQueryParamRawVO.Filter> filters;
 
     @ApiModelProperty("图表展示配置信息")
-    private String config;
+    private Object config;
 
     @ApiModelProperty("大盘id")
     private Integer dashboardId;
