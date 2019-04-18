@@ -74,7 +74,7 @@ public class MetricQueryParamRawVO {
 
         @NotNull
         @ApiModelProperty("维度")
-        private String dimensionFiled;
+        private String dimensionField;
         @ApiModelProperty("别名（非必填）")
         private String alias;
 
@@ -83,7 +83,7 @@ public class MetricQueryParamRawVO {
         }
 
         public String genSqlColumn() {
-            return StringUtils.isNotEmpty(alias) ? dimensionFiled + " as " + alias : dimensionFiled;
+            return StringUtils.isNotEmpty(alias) ? dimensionField + " as " + alias : dimensionField;
         }
     }
 

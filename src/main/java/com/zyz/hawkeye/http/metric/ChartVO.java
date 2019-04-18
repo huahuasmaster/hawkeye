@@ -51,4 +51,7 @@ public class ChartVO {
 
     @ApiModelProperty("最后修改时间")
     private Long lastModifyTime;
+
+    @ApiModelProperty("阈值，仅用于单指标情况(topN)")
+    private Integer threshold;
 }

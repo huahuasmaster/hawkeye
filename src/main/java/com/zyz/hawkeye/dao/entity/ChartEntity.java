@@ -16,6 +16,7 @@ public class ChartEntity {
     private String filters;
     private String config;
     private String defaultGranularity;
+    private Integer threshold;
 
     @Id
     @Column(name = "id")
@@ -137,5 +138,15 @@ public class ChartEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, datasourceId, name, chartDesc, type, aggregations, dimensions, filters, config, defaultGranularity);
+    }
+
+    @Basic
+    @Column(name = "threshold")
+    public Integer getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(Integer threshold) {
+        this.threshold = threshold;
     }
 }

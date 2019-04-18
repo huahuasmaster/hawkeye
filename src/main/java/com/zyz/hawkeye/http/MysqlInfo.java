@@ -7,4 +7,6 @@ public class MysqlInfo {
     private String host;
     private String database;
     private String table;
+    private String user;
+    private String password;
 }
