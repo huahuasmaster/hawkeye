@@ -20,9 +20,10 @@ public class DruidService {
      */
     public void compute(BinlogDTO binlogDTO) {
         // 1 根据信息找到对应的数据源
+
         // 2 根据数据源查询对应的指标变量
         // 3 根据指标变量进行计算，产生map
-        if (binlogDTO.getDatabase().equals("hawkeye")) {
+        if (binlogDTO.getDatabase().equals("hawkeye") || !binlogDTO.getType().equals("insert")) {
             return;
         }
         JSONObject jb = binlogDTO.getData();

@@ -10,7 +10,7 @@ public class DatasourceEntity {
     private int id;
     private String type;
     private String name;
-    private String chartDesc;
+    private String sourceDesc;
     private String config;
     private boolean enable;
     private Timestamp createDate;
@@ -53,13 +53,13 @@ public class DatasourceEntity {
     }
 
     @Basic
-    @Column(name = "chart_desc")
-    public String getChartDesc() {
-        return chartDesc;
+    @Column(name = "source_desc")
+    public String getSourceDesc() {
+        return sourceDesc;
     }
 
-    public void setChartDesc(String chartDesc) {
-        this.chartDesc = chartDesc;
+    public void setSourceDesc(String sourceDesc) {
+        this.sourceDesc = sourceDesc;
     }
 
     @Basic
@@ -171,7 +171,7 @@ public class DatasourceEntity {
                 enable == that.enable &&
                 Objects.equals(type, that.type) &&
                 Objects.equals(name, that.name) &&
-                Objects.equals(chartDesc, that.chartDesc) &&
+                Objects.equals(sourceDesc, that.sourceDesc) &&
                 Objects.equals(config, that.config) &&
                 Objects.equals(createDate, that.createDate) &&
                 Objects.equals(queryGranularity, that.queryGranularity) &&
@@ -185,6 +185,6 @@ public class DatasourceEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, name, chartDesc, config, enable, createDate, queryGranularity, fieldList, storageTime, dimensionList, metricList, sample, rollUp);
+        return Objects.hash(id, type, name, sourceDesc, config, enable, createDate, queryGranularity, fieldList, storageTime, dimensionList, metricList, sample, rollUp);
     }
 }

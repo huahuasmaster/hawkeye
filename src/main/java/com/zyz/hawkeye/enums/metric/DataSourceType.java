@@ -25,6 +25,6 @@ public enum DataSourceType {
                 return sourceType;
             }
         }
-        throw new UnsupportedOperationException("【SourceType】不支持type:" + type);
+            throw new UnsupportedOperationException("【SourceType】不支持type:" + type);
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 
 @Slf4j
 @SpringBootTest
@@ -27,7 +28,7 @@ public class KafkaDruidDataSourceTemplateTest {
         dataSourceVO.setRollUp(true);
         MysqlInfo mysqlInfo = new MysqlInfo();
         mysqlInfo.setTable("test_table");
-        dataSourceVO.setSourceInfo(JSON.toJSONString(mysqlInfo));
+        dataSourceVO.setSourceInfo(null);
 
         log.info(JSON.toJSONString(KafkaDruidDataSourceTemplate.newInstance(dataSourceVO)));
     }

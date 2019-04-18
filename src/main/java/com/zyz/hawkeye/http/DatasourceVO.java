@@ -1,13 +1,13 @@
 package com.zyz.hawkeye.http;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.zyz.hawkeye.dao.druid.entity.DruidDataSource;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 数据源view 对象.
@@ -33,7 +33,7 @@ public class DatasourceVO {
     private String desc;
 
     @ApiModelProperty("数据源配置信息,json格式。MYSQL:{address+database+table},BURY:{event}")
-    private String sourceInfo;
+    private Map<String, String> sourceInfo;
 
 //    @ApiModelProperty("字段与业务主键绑定,json格式。key-业务键id，value-数据源中对应的字段。支持多个绑定")
 //    private List<DicInfoDTO> bizMainKeys;
