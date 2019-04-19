@@ -6,6 +6,7 @@ import com.zyz.hawkeye.dao.entity.DatasourceEntity;
 import com.zyz.hawkeye.enums.metric.DataSourceType;
 import com.zyz.hawkeye.exception.HawkEyeException;
 import com.zyz.hawkeye.http.BuryInfo;
+import com.zyz.hawkeye.http.DatasourceVO;
 import com.zyz.hawkeye.http.MysqlInfo;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -58,16 +59,38 @@ public class InfoMap {
         }
     }
 
+    public boolean checkDuplicate(DatasourceVO datasourceVO) {
+//        switch (DataSourceType.fromType(datasourceVO.getType())) {
+//            case BURY:
+//                return getByMysqlInfo(datasourceVO.getSourceInfo().get("database"), datasourceVO.get)
+//                break;
+//            case MYSQL:
+//                registMysql(datasourceEntity);
+//                break;
+//            default:
+//                throw new HawkEyeException("不支持此类型");
+//        }
+        return false;
+
+    }
+
+
     public void registMysql(DatasourceEntity datasourceEntity) {
+        log.info("开始注册mysql", JSON.toJSONString(datasourceEntity));
         MysqlInfo key = JSON.parseObject(datasourceEntity.getConfig(), MysqlInfo.class);
 //        mysqlMap.remove(key);
         mysqlMap.put(key, datasourceEntity);
+        log.info("注册结束");
+
     }
 
     public void registBury(DatasourceEntity datasourceEntity) {
+        log.info("开始注册bury", JSON.toJSONString(datasourceEntity));
         BuryInfo key = JSON.parseObject(datasourceEntity.getConfig(), BuryInfo.class);
 //        buryMap.remove(key);
         buryMap.put(key, datasourceEntity);
+        log.info("注册结束");
+
     }
 
     public Optional<DatasourceEntity> getByMysqlInfo(String database, String table) {

@@ -1,12 +1,15 @@
 package com.zyz.hawkeye.dao.druid;
 
 import com.alibaba.fastjson.JSON;
+import com.zyz.hawkeye.config.KafkaDruidDataSourceTemplate;
 import com.zyz.hawkeye.dao.druid.entity.DruidDataSource;
 import com.zyz.hawkeye.dao.druid.entity.DruidQueryParams;
 import com.zyz.hawkeye.dao.druid.entity.DruidQueryResult;
 import com.zyz.hawkeye.enums.metric.GranularityOptions;
 import com.zyz.hawkeye.enums.metric.MetricAggregationType;
+import com.zyz.hawkeye.http.DatasourceVO;
 import com.zyz.hawkeye.http.metric.MetricQueryParamRawVO;
+import com.zyz.hawkeye.service.DatasourceService;
 import in.zapr.druid.druidry.Interval;
 import in.zapr.druid.druidry.aggregator.CountAggregator;
 import in.zapr.druid.druidry.extensions.distinctcount.aggregator.DistinctCountAggregator;
@@ -32,6 +35,9 @@ public class DruidDAOTest {
     @Autowired
     private DruidDAO druidDAO;
 
+    @Autowired
+    private DatasourceService datasourceService;
+
     @Test
     public void listAllDatasource() {
         log.info(druidDAO.listAllDatasourceName());
@@ -55,66 +61,9 @@ public class DruidDAOTest {
 
     @Test
     public void updateSourceTest() {
+        DatasourceVO vo = datasourceService.listAll().get(1);
 
-
-        // ParseSpecBean
-        DruidDataSource.DataSchemaBean.ParserBean.ParseSpecBean parserSpecBean = new DruidDataSource.DataSchemaBean.ParserBean.ParseSpecBean();
-        parserSpecBean.setFormat("json");
-        parserSpecBean.setTimestampSpec(new DruidDataSource.DataSchemaBean.ParserBean.ParseSpecBean.TimestampSpecBean("druidDate", "auto"));
-        parserSpecBean.setDimensionsSpec(new DruidDataSource.DataSchemaBean.ParserBean.ParseSpecBean.DimensionsSpecBean(
-                Arrays.asList("buyer_id", "book_id", "address_id", "trade_status","pay_id","online_platform","pay_status","pay_date","outer_trade_no","create_date","remark","require_invoice","dml_type"),
-                null
-                ));
-
-        // MetricsSpecBean
-        List<DruidDataSource.DataSchemaBean.MetricsSpecBean> metricsSpecBeans = Arrays.asList(
-                new DruidDataSource.DataSchemaBean.MetricsSpecBean("count", "count"),
-                new DruidDataSource.DataSchemaBean.MetricsSpecBean("doubleSum", "amount_sum", "order_amount")
-        );
-
-
-        // DataSchemaBean
-        DruidDataSource.DataSchemaBean dataSchemaBean = DruidDataSource.DataSchemaBean.builder()
-                .dataSource("hawkeye_mysql_t_order")
-                .granularitySpec(
-                        DruidDataSource.DataSchemaBean.GranularitySpecBean.builder()
-                        .queryGranularity("MINUTE")
-                        .segmentGranularity("DAY")
-                        .rollup(false)
-                        .type("uniform")
-                        .build()
-                )
-                .parser(
-                        DruidDataSource.DataSchemaBean.ParserBean.builder()
-                        .type("string")
-                        .parseSpec(parserSpecBean)
-                        .build()
-                )
-                .metricsSpec(metricsSpecBeans)
-                .build();
-
-        // IoConfigBean
-        DruidDataSource.IoConfigBean ioConfigBean = DruidDataSource.IoConfigBean.builder()
-                .topic("hawkeye_mysql_t_order")
-                .consumerProperties(new DruidDataSource.IoConfigBean.ConsumerPropertiesBean("192.168.1.101:9092"))
-                .taskCount(1)
-                .replicas(1)
-                .build();
-
-        //
-        DruidDataSource.TuningConfigBean tuningConfigBean = new DruidDataSource.TuningConfigBean();
-        tuningConfigBean.setType("kafka");
-        tuningConfigBean.setMaxRowsPerSegment(5000000);
-
-        DruidDataSource druidDataSource = DruidDataSource.builder()
-                .dataSchema(dataSchemaBean)
-                .ioConfig(ioConfigBean)
-                .type("kafka")
-                .tuningConfig(tuningConfigBean)
-                .context(null)
-                .build();
-        String result = druidDAO.updateDatasource(druidDataSource);
-        log.info(result);
+        druidDAO.updateDatasource(KafkaDruidDataSourceTemplate.newInstance(vo));
     }
 
 }

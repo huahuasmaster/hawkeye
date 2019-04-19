@@ -104,6 +104,7 @@ public class DruidDAO {
     }
 
     public void insert(String dataSourceName, Map<String, Object> data) {
+        log.info("开始发送kafka消息, {}", dataSourceName);
         if (data == null) {
             throw new HawkEyeException("druid数据不能为空");
         }
@@ -117,6 +118,7 @@ public class DruidDAO {
 //        ProducerRecord<String, String> record = new ProducerRecord<>(dataSourceName, JSON.toJSONString(data));
         // [约定]datasourcename同时也是kafka的topic
         kafkaTemplate.send(dataSourceName, JSON.toJSONString(data));
+        log.info("kafka消息发送完毕", dataSourceName);
     }
 
     /**

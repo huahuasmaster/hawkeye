@@ -3,20 +3,25 @@ package com.zyz.hawkeye.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mysql.cj.jdbc.MysqlDataSource;
+import com.zyz.hawkeye.config.KafkaDruidDataSourceTemplate;
 import com.zyz.hawkeye.dao.DatasourceRepository;
+import com.zyz.hawkeye.dao.druid.DruidDAO;
 import com.zyz.hawkeye.dao.entity.DatasourceEntity;
 import com.zyz.hawkeye.enums.metric.DataSourceType;
 import com.zyz.hawkeye.exception.HawkEyeException;
 import com.zyz.hawkeye.http.DatasourceVO;
 import com.zyz.hawkeye.http.MysqlInfo;
+import com.zyz.hawkeye.util.InfoMap;
 import com.zyz.hawkeye.util.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,8 +33,32 @@ public class DatasourceService {
     @Autowired
     private DatasourceRepository datasourceRepository;
 
+    @Autowired
+    private DruidDAO druidDAO;
+
+    @Autowired
+    private InfoMap infoMap;
+
     public Integer save(DatasourceVO datasourceVO) {
-        return datasourceRepository.save(VO2Entity(datasourceVO)).getId();
+        // 检查冲突
+
+        // 创建druid.datasource
+        datasourceVO.setName(getTopic(datasourceVO));
+        if (CollectionUtils.isEmpty(datasourceVO.getMetricList())) {
+            datasourceVO.setMetricList(Collections.singletonList("count"));
+        } else {
+            datasourceVO.getMetricList().add("count");
+        }
+
+        druidDAO.updateDatasource(KafkaDruidDataSourceTemplate.newInstance(datasourceVO));
+
+        // 落库
+        DatasourceEntity entity = datasourceRepository.save(VO2Entity(datasourceVO));
+
+        // 在infomap中启用
+        infoMap.regist(entity);
+
+        return entity.getId();
     }
 
     public List<DatasourceVO> listAll() {
@@ -63,6 +92,7 @@ public class DatasourceService {
         vo.setDimensionList(JSON.parseArray(entity.getDimensionList(), String.class));
         vo.setEnable(entity.isEnable());
         vo.setRollUp(entity.getRollUp());
+        vo.setDesc(entity.getSourceDesc());
         return vo;
     }
 
@@ -74,7 +104,7 @@ public class DatasourceService {
         datasourceEntity.setCreateDate(new Timestamp(System.currentTimeMillis()));
         datasourceEntity.setFieldList(JSON.toJSONString(datasourceVO.getFieldList()));
         datasourceEntity.setDimensionList(JSON.toJSONString(datasourceVO.getDimensionList()));
-        datasourceEntity.setMetricList(JSON.toJSONString(datasourceVO.getDimensionList()));
+        datasourceEntity.setMetricList(JSON.toJSONString(datasourceVO.getMetricList()));
         datasourceEntity.setEnable(true);
         datasourceEntity.setRollUp(false);
         datasourceEntity.setQueryGranularity("1分钟");
@@ -123,5 +153,7 @@ public class DatasourceService {
         JSONObject jsonObject = JSONObject.parseObject(sample);
         return JSONUtil.flatToList("", jsonObject);
     }
+
+//    public int switch(boolean wannaEnable)
 
 }

@@ -28,7 +28,9 @@ public class KafkaDruidDataSourceTemplate {
         );
 
         if (!CollectionUtils.isEmpty(dataSourceVO.getMetricList())) {
-            dataSourceVO.getMetricList().forEach((metric) -> metricsSpecBeans.add(new DruidDataSource.DataSchemaBean.MetricsSpecBean("doubleSum", metric, metric)));
+            dataSourceVO.getMetricList().
+                    stream().filter(m -> !m.equals("count"))
+                    .forEach((metric) -> metricsSpecBeans.add(new DruidDataSource.DataSchemaBean.MetricsSpecBean("doubleSum", metric, metric)));
         }
 
 
@@ -37,7 +39,7 @@ public class KafkaDruidDataSourceTemplate {
                 .dataSource(dataSourceVO.getName())
                 .granularitySpec(
                         DruidDataSource.DataSchemaBean.GranularitySpecBean.builder()
-                                .queryGranularity(dataSourceVO.getQueryGranularity())
+                                .queryGranularity("MINUTE")
                                 .segmentGranularity("DAY")
                                 .rollup(dataSourceVO.getRollUp())
                                 .type("uniform")
