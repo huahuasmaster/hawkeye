@@ -1,5 +1,6 @@
 package com.zyz.hawkeye.service;
 
+import ch.qos.logback.core.util.AggregationType;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zyz.hawkeye.dao.ChartRepository;
@@ -10,6 +11,7 @@ import com.zyz.hawkeye.dao.druid.entity.DruidQueryResult;
 import com.zyz.hawkeye.dao.entity.ChartEntity;
 import com.zyz.hawkeye.dao.entity.DatasourceEntity;
 import com.zyz.hawkeye.enums.metric.GranularityOptions;
+import com.zyz.hawkeye.enums.metric.MetricAggregationType;
 import com.zyz.hawkeye.enums.metric.MetricVariableDataType;
 import com.zyz.hawkeye.enums.metric.MetricVariableType;
 import com.zyz.hawkeye.exception.HawkEyeException;
@@ -18,7 +20,6 @@ import in.zapr.druid.druidry.Interval;
 import in.zapr.druid.druidry.aggregator.DruidAggregator;
 import in.zapr.druid.druidry.dimension.DefaultDimension;
 import in.zapr.druid.druidry.dimension.enums.OutputType;
-import javafx.util.Pair;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,10 +138,14 @@ public class ChartService {
                 throw new HawkEyeException("无有效数据源");
             }
 
-            // 逐个查询结果, 并组装成数据源名称-》查询结果的映射
+            // 逐个查询结果, 并组装成数据源描述-》查询结果的映射
+            params.setAggregations(
+                    Collections.singletonList(MetricAggregationType.COUNT.getAggregation(null, "数量"))
+            );
+
             Map<String, List<DruidQueryResult>> nameResultMap = datasourceEntities.stream()
                     .collect(Collectors.toMap(
-                            DatasourceEntity::getName,
+                            DatasourceEntity::getSourceDesc,
                             entity -> {
                                 params.setDataSource(entity.getName());
                                 return druidDAO.query(params);
@@ -172,7 +177,7 @@ public class ChartService {
                     if (e.isPresent()) {
                         Map<String, Object> dataOfAnDatasource = new HashMap<>();
                         dataOfAnDatasource.put(e.get().getKey(), e.get().getValue()); // 将作为图表的指标
-                        dataOfAnDatasource.put("name", datasourceName); //将作为图标的维度
+                        dataOfAnDatasource.put("名称", datasourceName); //将作为图标的维度
                         finalResult.add(dataOfAnDatasource);
                     }
                 }

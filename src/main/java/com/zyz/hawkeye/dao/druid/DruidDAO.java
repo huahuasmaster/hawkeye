@@ -104,7 +104,8 @@ public class DruidDAO {
     }
 
     public void insert(String dataSourceName, Map<String, Object> data) {
-        log.info("开始发送kafka消息, {}", dataSourceName);
+        String json = JSON.toJSONString(data);
+        log.info("开始发送kafka消息, {},\n{}", dataSourceName, json);
         if (data == null) {
             throw new HawkEyeException("druid数据不能为空");
         }
