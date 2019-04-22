@@ -30,6 +30,12 @@ public class DashboardController {
         return HawkeyeResponse.success(dashboardService.get(dashboardId));
     }
 
+    @PutMapping("/{dashboardId}/layout")
+    public HawkeyeResponse<Integer> updateLayout(@PathVariable("dashboardId") Integer dashboardId, @RequestBody String content) {
+        return HawkeyeResponse.success(dashboardService.updateLayout(dashboardId, content));
+    }
+
+
 
 
 }

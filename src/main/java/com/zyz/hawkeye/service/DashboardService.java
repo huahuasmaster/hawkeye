@@ -1,6 +1,9 @@
 package com.zyz.hawkeye.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Sets;
 import com.zyz.hawkeye.dao.DashboardRepository;
 import com.zyz.hawkeye.dao.entity.DashboardEntity;
 import com.zyz.hawkeye.exception.HawkEyeException;
@@ -8,10 +11,11 @@ import com.zyz.hawkeye.http.DashboardVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,5 +50,32 @@ public class DashboardService {
             );
         }
         return vo;
+    }
+
+    public int updateLayout(Integer dashboardId, String content) {
+        DashboardEntity entity = dashboardRepository.findById(dashboardId)
+                .orElseThrow(() -> new HawkEyeException("无此看板"));
+        JSONObject jb = JSON.parseObject(entity.getConfig());
+        JSONArray ja = JSONArray.parseArray(content);
+        jb.put("layout", ja);
+        entity.setConfig(jb.toJSONString());
+        dashboardRepository.save(entity);
+        return 1;
+    }
+
+    public int addChart(Integer dashboardId, Integer chartId) {
+        DashboardEntity entity = dashboardRepository.findById(dashboardId)
+                .orElseThrow(() -> new HawkEyeException("无此看板"));
+        List<Integer> ints = JSON.parseArray(entity.getChartIds(), Integer.class);
+        Set<Integer> chartSet = ints == null ? Sets.newHashSet() : Sets.newHashSet(ints);
+
+        chartSet.add(chartId);
+        entity.setChartIds(JSON.toJSONString(chartSet));
+        dashboardRepository.save(entity);
+        return 1;
+//        JSONObject jb = JSON.parseObject(entity.getConfig());
+////
+////        List<GridItemVO> grids = JSON.parseArray(jb.getString("layout"), GridItemVO.class);
+
     }
 }

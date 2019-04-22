@@ -23,8 +23,7 @@ public class ChartController {
 
     @PostMapping("")
     public HawkeyeResponse<Integer> add(@RequestBody ChartVO chartVO) {
-        chartService.save(chartVO);
-        return HawkeyeResponse.success(1);
+        return HawkeyeResponse.success(chartService.save(chartVO));
     }
 
 

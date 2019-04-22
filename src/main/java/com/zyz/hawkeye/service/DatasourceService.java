@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import com.zyz.hawkeye.config.KafkaDruidDataSourceTemplate;
+import com.zyz.hawkeye.constants.BuryFields;
 import com.zyz.hawkeye.dao.DatasourceRepository;
+import com.zyz.hawkeye.dao.FieldMapRepository;
 import com.zyz.hawkeye.dao.druid.DruidDAO;
 import com.zyz.hawkeye.dao.entity.DatasourceEntity;
 import com.zyz.hawkeye.enums.metric.DataSourceType;
@@ -37,6 +39,9 @@ public class DatasourceService {
     private DruidDAO druidDAO;
 
     @Autowired
+    private FieldMapService fieldMapService;
+
+    @Autowired
     private InfoMap infoMap;
 
     public Integer save(DatasourceVO datasourceVO) {
@@ -50,13 +55,20 @@ public class DatasourceService {
             datasourceVO.getMetricList().add("count");
         }
 
-        druidDAO.updateDatasource(KafkaDruidDataSourceTemplate.newInstance(datasourceVO));
 
         // 落库
         DatasourceEntity entity = datasourceRepository.save(VO2Entity(datasourceVO));
 
         // 在infomap中启用
         infoMap.regist(entity);
+
+        // 在字段映射表中保存映射
+        if (datasourceVO.getType().equals("BURY")) {
+            saveFieldMap(datasourceVO.getMetricList(), "metric", entity.getId());
+            saveFieldMap(datasourceVO.getDimensionList(), "dimension", entity.getId());
+        } else {
+            druidDAO.updateDatasource(KafkaDruidDataSourceTemplate.newInstance(datasourceVO));
+        }
 
         return entity.getId();
     }
@@ -155,5 +167,15 @@ public class DatasourceService {
     }
 
 //    public int switch(boolean wannaEnable)
+
+    private void saveFieldMap(List<String> fields, String type, Integer datasourceId) {
+        fields.forEach(field -> {
+            if (!BuryFields.DEFINED_FIELDS.contains(fields)) {
+                // 记录映射
+                fieldMapService.save(datasourceId, field, type);
+            }
+        });
+
+    }
 
 }
