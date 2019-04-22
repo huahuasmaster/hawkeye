@@ -47,6 +47,10 @@ public class ChartService {
         return chartRepository.save(VO2Entity(chartVO)).getId();
     }
 
+    public ChartVO get(Integer id) {
+        return entity2VO(chartRepository.findById(id).orElse(null));
+    }
+
     public List<ChartVO> listByDashboardId(Integer dashboardId) {
         List<ChartVO> result = new ArrayList<>();
         List<ChartEntity> entities = chartRepository.findAll();
@@ -255,6 +259,9 @@ public class ChartService {
     }
 
     private ChartVO entity2VO(ChartEntity chartEntity) {
+        if (chartEntity == null) {
+            return null;
+        }
         ChartVO chartVO = new ChartVO();
         BeanUtils.copyProperties(chartEntity, chartVO);
         chartVO.setAggregations(JSON.parseArray(chartEntity.getAggregations(), MetricQueryParamRawVO.Aggregation.class));
@@ -266,6 +273,9 @@ public class ChartService {
     }
 
     private ChartEntity VO2Entity(ChartVO chartVO) {
+        if (chartVO == null) {
+            return null;
+        }
         ChartEntity chartEntity = new ChartEntity();
 //        chartEntity.setId(chartVO.getId());
         chartEntity.setName(chartVO.getName());

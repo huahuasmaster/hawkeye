@@ -11,6 +11,8 @@ public class DashboardEntity {
     private String name;
     private String dashboardDesc;
     private Timestamp createDate;
+    private String config;
+    private String chartIds;
 
     @Id
     @Column(name = "id")
@@ -66,5 +68,25 @@ public class DashboardEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, dashboardDesc, createDate);
+    }
+
+    @Basic
+    @Column(name = "config")
+    public String getConfig() {
+        return config;
+    }
+
+    public void setConfig(String config) {
+        this.config = config;
+    }
+
+    @Basic
+    @Column(name = "chart_ids")
+    public String getChartIds() {
+        return chartIds;
+    }
+
+    public void setChartIds(String chartIds) {
+        this.chartIds = chartIds;
     }
 }
