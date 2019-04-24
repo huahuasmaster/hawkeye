@@ -27,10 +27,9 @@ public class FieldMapService {
 
     public int save(Integer datasourceId, String fieldName, String type) {
         Integer maxIndex = fieldMapRepository.getMaxIndex(datasourceId, type);
-        if (maxIndex <= 0) {
+        if (maxIndex == null || maxIndex <= 0) {
             maxIndex = 0;
-        }
-        if (maxIndex >= 4) {
+        } else if (maxIndex >= 4) {
             throw new HawkEyeException("字段数超过阈值");
         }
         maxIndex++;

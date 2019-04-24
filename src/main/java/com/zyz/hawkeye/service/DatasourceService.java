@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.sql.*;
@@ -44,6 +45,7 @@ public class DatasourceService {
     @Autowired
     private InfoMap infoMap;
 
+    @Transactional
     public Integer save(DatasourceVO datasourceVO) {
         // 检查冲突
 
@@ -170,7 +172,7 @@ public class DatasourceService {
 
     private void saveFieldMap(List<String> fields, String type, Integer datasourceId) {
         fields.forEach(field -> {
-            if (!BuryFields.DEFINED_FIELDS.contains(fields)) {
+            if (!BuryFields.DEFINED_FIELDS.contains(field)) {
                 // 记录映射
                 fieldMapService.save(datasourceId, field, type);
             }

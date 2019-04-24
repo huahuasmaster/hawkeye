@@ -12,7 +12,6 @@ import com.zyz.hawkeye.dao.entity.DatasourceEntity;
 import com.zyz.hawkeye.enums.metric.GranularityOptions;
 import com.zyz.hawkeye.enums.metric.MetricAggregationType;
 import com.zyz.hawkeye.enums.metric.MetricVariableDataType;
-import com.zyz.hawkeye.enums.metric.MetricVariableType;
 import com.zyz.hawkeye.exception.HawkEyeException;
 import com.zyz.hawkeye.http.metric.*;
 import in.zapr.druid.druidry.Interval;
@@ -22,7 +21,7 @@ import in.zapr.druid.druidry.dimension.enums.OutputType;
 import in.zapr.druid.druidry.filter.AndFilter;
 import in.zapr.druid.druidry.filter.DruidFilter;
 import in.zapr.druid.druidry.filter.SelectorFilter;
-import javafx.util.Pair;
+import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,11 +33,11 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-import static com.zyz.hawkeye.enums.metric.MetricFilterType.EQUAL;
 import static com.zyz.hawkeye.enums.metric.MetricVariableType.DIMENSION;
 import static com.zyz.hawkeye.enums.metric.MetricVariableType.METRIC;
 
 @Service
+@Slf4j
 public class ChartService {
 
     @Autowired
@@ -84,6 +83,7 @@ public class ChartService {
         // 1查询并检验图表
         ChartEntity chartEntity = chartRepository.findById(metricParamChartVO.getChartId())
                 .orElseThrow(() -> new HawkEyeException("图表不存在或者已经被删除"));
+        log.info("开始查询图表：{}的结果",chartEntity.getName());
 
         // 2根据图表配置生成查询参数, 先是通用的指标，后面按是否为漏斗图进行区分
         DruidQueryParams params = new DruidQueryParams();
@@ -132,9 +132,9 @@ public class ChartService {
                             DatasourceEntity::getSourceDesc,
                             entity -> {
                                 // 填装个性化的参数
-                                params.setFilter(new SelectorFilter(
-                                        "event",
-                                        JSON.parseObject(entity.getConfig()).getString("event")));
+
+                                // 过滤器
+                                cleanAndinjectBuryFilter(params, entity);
 
                                 params.setDataSource(entity.getType().equals("MYSQL") ? entity.getName() : DruidService.BURY_TOPIC);
 
@@ -197,30 +197,31 @@ public class ChartService {
 
             // 过滤条件
             List<MetricQueryParamRawVO.Filter> filters = metricParamChartVO.getFilters();
+            List<DruidFilter> filterCollect = new ArrayList<>();
             if (!CollectionUtils.isEmpty(filters)) {
-                List<DruidFilter> collect = filters.stream().map(f -> f.getMetricFilterType().getDruidFilter(
+                filterCollect = filters.stream().map(f -> f.getMetricFilterType().getDruidFilter(
                         fieldMap.getOrDefault(f.getField(), f.getField()),
                         f.getData(),
                         JSON.parseArray(datasourceEntity.getMetricList(), String.class).contains(f.getField()) ? METRIC : DIMENSION
                 )).collect(Collectors.toList());
 
-                // 加入埋点数据所需要的filter
-                if (datasourceEntity.getType().equals("BURY")) {
-                    DruidFilter buryFilter = new SelectorFilter(
-                            "event",
-                            JSON.parseObject(datasourceEntity.getConfig()).getString("event"));
+            }
 
-                    if (CollectionUtils.isEmpty(collect)) {
-                        collect = Collections.singletonList(buryFilter);
-                    } else {
-                        collect.add(buryFilter);
-                    }
+            // 加入埋点数据所需要的filter
+            if (datasourceEntity.getType().equals("BURY")) {
+                DruidFilter buryFilter = new SelectorFilter(
+                        "event",
+                        JSON.parseObject(datasourceEntity.getConfig()).getString("event"));
+
+                if (CollectionUtils.isEmpty(filterCollect)) {
+                    filterCollect = Collections.singletonList(buryFilter);
+                } else {
+                    filterCollect.add(buryFilter);
                 }
+            }
 
-                if (!CollectionUtils.isEmpty(collect)) {
-                    params.setFilter(collect.size() > 1 ? new AndFilter(collect) : collect.get(0));
-                }
-
+            if (!CollectionUtils.isEmpty(filterCollect)) {
+                params.setFilter(filterCollect.size() > 1 ? new AndFilter(filterCollect) : filterCollect.get(0));
             }
 
             // 产生聚合器
@@ -337,6 +338,16 @@ public class ChartService {
         chartEntity.setFilters(JSON.toJSONString(chartVO.getFilters()));
         chartEntity.setThreshold(chartVO.getThreshold());
         return chartEntity;
+    }
+
+    private void cleanAndinjectBuryFilter(DruidQueryParams params, DatasourceEntity entity) {
+        if (entity.getType().equals("BURY")) {
+            params.setFilter(new SelectorFilter(
+                    "event",
+                    JSON.parseObject(entity.getConfig()).getString("event")));
+        } else {
+            params.setFilter(null);
+        }
     }
 
 }
