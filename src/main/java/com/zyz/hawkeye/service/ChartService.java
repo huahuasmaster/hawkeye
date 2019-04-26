@@ -65,6 +65,12 @@ public class ChartService {
         return entity2VO(chartRepository.findById(id).orElse(null));
     }
 
+    public int delete(Integer dashboardId, Integer chartId) {
+        chartRepository.deleteById(chartId);
+        dashboardService.removeChart(dashboardId, chartId);
+        return 1;
+    }
+
     public List<ChartVO> listByDashboardId(Integer dashboardId) {
         List<ChartVO> result = new ArrayList<>();
         List<ChartEntity> entities = chartRepository.findAll();

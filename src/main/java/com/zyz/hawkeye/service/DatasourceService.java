@@ -75,6 +75,27 @@ public class DatasourceService {
         return entity.getId();
     }
 
+    public Integer updateDesc(Integer datasourceId, String desc) {
+        DatasourceEntity entity = datasourceRepository.findById(datasourceId)
+                .orElseThrow(() -> new HawkEyeException("此数据源不存在或者已经被删除"));
+        entity.setSourceDesc(desc);
+        datasourceRepository.save(entity);
+        return 1;
+    }
+
+    public Integer switchEnabled(Integer datasourceId, boolean wannaEnable) {
+        DatasourceEntity entity = datasourceRepository.findById(datasourceId)
+                .orElseThrow(() -> new HawkEyeException("此数据源不存在或者已经被删除"));
+        entity.setEnable(wannaEnable);
+        datasourceRepository.save(entity);
+        if (wannaEnable) {
+            infoMap.regist(entity);
+        } else {
+            infoMap.unregist(entity);
+        }
+        return 1;
+    }
+
     public List<DatasourceVO> listAll() {
         return datasourceRepository.findAll()
                 .stream().map(this::entity2VO).collect(Collectors.toList());

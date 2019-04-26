@@ -1,6 +1,7 @@
 package com.zyz.hawkeye.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.zyz.hawkeye.enums.metric.DataSourceType;
 import com.zyz.hawkeye.exception.HawkEyeException;
 import com.zyz.hawkeye.http.DatasourceVO;
@@ -30,9 +31,12 @@ public class DatasourceController {
     public HawkeyeResponse<List<String>> listFields(@RequestParam("info") String info,
                                                     @RequestParam("type") String type) {
         switch (DataSourceType.fromType(type)) {
-            case MYSQL: return HawkeyeResponse.success(datasourceService.listFields(JSON.parseObject(info, MysqlInfo.class)));
-            case BURY: return HawkeyeResponse.success(datasourceService.listFields(info));
-            default: throw new HawkEyeException("不支持的数据源类型");
+            case MYSQL:
+                return HawkeyeResponse.success(datasourceService.listFields(JSON.parseObject(info, MysqlInfo.class)));
+            case BURY:
+                return HawkeyeResponse.success(datasourceService.listFields(info));
+            default:
+                throw new HawkEyeException("不支持的数据源类型");
         }
 
     }
@@ -41,6 +45,17 @@ public class DatasourceController {
     public HawkeyeResponse<Integer> add(@RequestBody DatasourceVO datasourceVO) {
         log.info(JSON.toJSONString(datasourceVO));
         return HawkeyeResponse.success(datasourceService.save(datasourceVO));
+    }
+
+    @PutMapping("/{datasourceId}/desc")
+    public HawkeyeResponse<Integer> updateDesc(@PathVariable("datasourceId") Integer datasourceId, @RequestBody String desc) {
+        return HawkeyeResponse.success(datasourceService.updateDesc(datasourceId, desc));
+    }
+
+    @PutMapping("/{datasourceId}/enabled")
+    public HawkeyeResponse<Integer> updateEnabled(@PathVariable("datasourceId") Integer datasourceId, @RequestBody String playLoad) {
+        Boolean wannanEnable = JSON.parseObject(playLoad).getBoolean("enable");
+        return HawkeyeResponse.success(datasourceService.switchEnabled(datasourceId, wannanEnable));
     }
 
 }

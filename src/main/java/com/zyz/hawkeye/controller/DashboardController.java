@@ -35,6 +35,11 @@ public class DashboardController {
         return HawkeyeResponse.success(dashboardService.updateLayout(dashboardId, content));
     }
 
+    @DeleteMapping("/{dashboardId}/charts/{chartId}")
+    public HawkeyeResponse<Integer> removeChart(@PathVariable("dashboardId") Integer dashboardId, @PathVariable("chartId") Integer chartId) {
+        return HawkeyeResponse.success(chartService.delete(dashboardId, chartId));
+    }
+
 
 
 

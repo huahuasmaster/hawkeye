@@ -8,6 +8,7 @@ import com.zyz.hawkeye.dao.DashboardRepository;
 import com.zyz.hawkeye.dao.entity.DashboardEntity;
 import com.zyz.hawkeye.exception.HawkEyeException;
 import com.zyz.hawkeye.http.DashboardVO;
+import com.zyz.hawkeye.http.GridItemVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,6 +77,24 @@ public class DashboardService {
 //        JSONObject jb = JSON.parseObject(entity.getConfig());
 ////
 ////        List<GridItemVO> grids = JSON.parseArray(jb.getString("layout"), GridItemVO.class);
+
+    }
+
+    public int removeChart(Integer dashboardId, Integer chartId) {
+        DashboardEntity entity = dashboardRepository.findById(dashboardId)
+                .orElseThrow(() -> new HawkEyeException("无此看板"));
+        List<Integer> ints = JSON.parseArray(entity.getChartIds(), Integer.class);
+        Set<Integer> chartSet = ints == null ? Sets.newHashSet() : Sets.newHashSet(ints);
+        chartSet.remove(chartId);
+        JSONObject jb = JSON.parseObject(entity.getConfig());
+        List<GridItemVO> gridItemVOS = JSON.parseArray(jb.getString("layout"), GridItemVO.class);
+        gridItemVOS = gridItemVOS.stream().filter(g -> !g.getI().equals(chartId)).collect(Collectors.toList());
+        jb.put("layout", gridItemVOS);
+
+        entity.setChartIds(JSON.toJSONString(chartSet));
+        entity.setConfig(JSON.toJSONString(jb));
+        dashboardRepository.save(entity);
+        return 1;
 
     }
 }

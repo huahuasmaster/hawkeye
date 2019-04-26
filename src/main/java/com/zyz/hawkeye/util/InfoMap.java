@@ -77,7 +77,7 @@ public class InfoMap {
 
     public void registMysql(DatasourceEntity datasourceEntity) {
         log.info("开始注册mysql", JSON.toJSONString(datasourceEntity));
-        MysqlInfo key = JSON.parseObject(datasourceEntity.getConfig(), MysqlInfo.class);
+        MysqlInfo key = getMysqlKey(datasourceEntity);
 //        mysqlMap.remove(key);
         mysqlMap.put(key, datasourceEntity);
         log.info("注册结束");
@@ -86,11 +86,44 @@ public class InfoMap {
 
     public void registBury(DatasourceEntity datasourceEntity) {
         log.info("开始注册bury", JSON.toJSONString(datasourceEntity));
-        BuryInfo key = JSON.parseObject(datasourceEntity.getConfig(), BuryInfo.class);
+        BuryInfo key = getBuryKey(datasourceEntity);
 //        buryMap.remove(key);
         buryMap.put(key, datasourceEntity);
         log.info("注册结束");
 
+    }
+
+    private void unregistMysql(DatasourceEntity datasourceEntity) {
+        log.info("开始卸载mysql", JSON.toJSONString(datasourceEntity));
+        MysqlInfo key = getMysqlKey(datasourceEntity);
+//        mysqlMap.remove(key);
+        mysqlMap.remove(key);
+        log.info("卸载结束");
+    }
+
+    public void unregistBury(DatasourceEntity datasourceEntity) {
+        log.info("开始卸载bury", JSON.toJSONString(datasourceEntity));
+        BuryInfo key = getBuryKey(datasourceEntity);
+//        buryMap.remove(key);
+        buryMap.remove(key);
+        log.info("卸载结束");
+
+    }
+
+    public void unregist(DatasourceEntity datasourceEntity) {
+        switch (DataSourceType.fromType(datasourceEntity.getType())) {
+            case MYSQL:unregistMysql(datasourceEntity);break;
+            case BURY:unregistBury(datasourceEntity);break;
+        }
+    }
+
+
+    public MysqlInfo getMysqlKey(DatasourceEntity datasourceEntity) {
+        return JSON.parseObject(datasourceEntity.getConfig(), MysqlInfo.class);
+    }
+
+    public BuryInfo getBuryKey(DatasourceEntity datasourceEntity) {
+        return JSON.parseObject(datasourceEntity.getConfig(), BuryInfo.class);
     }
 
     public Optional<DatasourceEntity> getByMysqlInfo(String database, String table) {
