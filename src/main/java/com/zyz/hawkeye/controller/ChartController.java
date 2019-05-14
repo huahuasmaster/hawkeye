@@ -26,7 +26,9 @@ public class ChartController {
         return HawkeyeResponse.success(chartService.save(chartVO));
     }
 
-
-
+    @PutMapping("/{chartId}")
+    public HawkeyeResponse<Integer> update(@PathVariable("chartId") Integer chartId, @RequestBody ChartVO chartVO) {
+        return HawkeyeResponse.success(chartService.update(chartVO));
+    }
 
 }

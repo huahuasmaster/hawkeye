@@ -8,22 +8,19 @@ import java.util.Map;
 @Data
 public class BinlogDTO {
 
-    private String database;
+    private String database;// 数据库名
 
-    private String table;
+    private String table;// 表名
 
-    private String type;
+    private String type;// DML类型
 
-    // dml发生的时间
-    private Long ts;
+    private Long ts;// DML发生的时间
 
-    private Long xid;
+    private Long xid;// 数据库事务ID
 
-    private Boolean commit;
+    private Boolean commit;// 事务是否提交
 
-    // 完整的数据，在改数据时，此处为修改后的数据
-    private JSONObject data;
+    private JSONObject data;// 修改后的完整的数据。
 
-    // 改数据时才会有，只保存被修改的旧数据
-    private JSONObject old;
+    private JSONObject old;// update或delete操作前的旧数据。
 }

@@ -61,6 +61,15 @@ public class ChartService {
         return id;
     }
 
+    public int update(ChartVO chartVO) {
+        ChartEntity chartEntity = chartRepository.findById(chartVO.getId())
+                .orElseThrow(() -> new HawkEyeException("无此图表，或者已经被删除"));
+        chartEntity = VO2Entity(chartVO);
+        chartEntity.setId(chartVO.getId());
+        chartRepository.save(chartEntity);
+        return 1;
+    }
+
     public ChartVO get(Integer id) {
         return entity2VO(chartRepository.findById(id).orElse(null));
     }
