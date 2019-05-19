@@ -6,6 +6,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "t_field_map", schema = "hawkeye", catalog = "")
 public class FieldMapEntity {
+
     private int id;
     private int druidIndex;
     private int datasourceId;
@@ -14,6 +15,7 @@ public class FieldMapEntity {
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public int getId() {
         return id;
     }

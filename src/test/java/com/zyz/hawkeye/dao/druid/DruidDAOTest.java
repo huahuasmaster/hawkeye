@@ -66,4 +66,10 @@ public class DruidDAOTest {
         druidDAO.updateDatasource(KafkaDruidDataSourceTemplate.newInstance(vo));
     }
 
+    @Test
+    public void sqlTest() {
+        String sql = "select * from hawkeye_mysql_t_order order by \"__time\" desc limit 30";
+        log.info("使用sql查询数据:{}", druidDAO.sql(sql));
+    }
+
 }

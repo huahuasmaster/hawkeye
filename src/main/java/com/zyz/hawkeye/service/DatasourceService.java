@@ -8,11 +8,13 @@ import com.zyz.hawkeye.constants.BuryFields;
 import com.zyz.hawkeye.dao.DatasourceRepository;
 import com.zyz.hawkeye.dao.FieldMapRepository;
 import com.zyz.hawkeye.dao.druid.DruidDAO;
+import com.zyz.hawkeye.dao.druid.entity.DruidQueryResult;
 import com.zyz.hawkeye.dao.entity.DatasourceEntity;
 import com.zyz.hawkeye.enums.metric.DataSourceType;
 import com.zyz.hawkeye.exception.HawkEyeException;
 import com.zyz.hawkeye.http.DatasourceVO;
 import com.zyz.hawkeye.http.MysqlInfo;
+import com.zyz.hawkeye.http.metric.MetricResultVO;
 import com.zyz.hawkeye.util.InfoMap;
 import com.zyz.hawkeye.util.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +46,26 @@ public class DatasourceService {
 
     @Autowired
     private InfoMap infoMap;
+
+    /**
+     * 预览数据源中的数据
+     * @param datasourceId
+     * @param threshold
+     * @return
+     */
+    public String preview(Integer datasourceId, Integer threshold) {
+        String sql;
+        DatasourceEntity entity = datasourceRepository.findById(datasourceId)
+                .orElseThrow(() -> new HawkEyeException("此数据源不存在或者已经被删除"));
+        if (entity.getType().equals("MYSQL")) {
+            sql = String.format("select * from %s order by \"__time\" desc limit %s", entity.getName(), threshold);
+        } else {
+            sql = String.format("select * from hawkeye_bury where \"event\" = '%s' order by \"__time\" desc limit %s",
+                    JSON.parseObject(entity.getConfig()).getString("event"),
+                    threshold);
+        }
+        return druidDAO.sql(sql);
+    }
 
     @Transactional
     public Integer save(DatasourceVO datasourceVO) {

@@ -58,4 +58,9 @@ public class DatasourceController {
         return HawkeyeResponse.success(datasourceService.switchEnabled(datasourceId, wannanEnable));
     }
 
+    @GetMapping("/{datasourceId}/previewData")
+    public HawkeyeResponse<String> previewData(@PathVariable("datasourceId") Integer datasourceId) {
+        return HawkeyeResponse.success(datasourceService.preview(datasourceId, 8));
+    }
+
 }

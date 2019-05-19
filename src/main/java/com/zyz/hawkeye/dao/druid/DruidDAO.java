@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.zyz.hawkeye.dao.druid.entity.*;
 import com.zyz.hawkeye.exception.HawkEyeException;
+import com.zyz.hawkeye.http.metric.SqlQueryVO;
 import com.zyz.hawkeye.util.OkHttpClientWrapper;
 import in.zapr.druid.druidry.query.aggregation.DruidAggregationQuery;
 import in.zapr.druid.druidry.query.aggregation.DruidGroupByQuery;
@@ -237,5 +238,11 @@ public class DruidDAO {
                     // 过滤list中只有一个map且map的size为0的元素
                     return !(r.getResult().size() == 1 && r.getResult().get(0).size() == 0);
                 }).collect(Collectors.toList());
+    }
+
+    public String sql(String sql) {
+        SqlQueryVO vo = new SqlQueryVO();
+        vo.setQuery(sql);
+        return clientWrapper.post(brokerPrefix + "/druid/v2/sql", JSON.toJSONString(vo));
     }
 }
