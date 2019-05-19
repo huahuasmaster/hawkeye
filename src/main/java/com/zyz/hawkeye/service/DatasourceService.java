@@ -83,8 +83,7 @@ public class DatasourceService {
         // 落库
         DatasourceEntity entity = datasourceRepository.save(VO2Entity(datasourceVO));
 
-        // 在infomap中启用
-        infoMap.regist(entity);
+
 
         // 在字段映射表中保存映射
         if (datasourceVO.getType().equals("BURY")) {
@@ -93,6 +92,9 @@ public class DatasourceService {
         } else {
             druidDAO.updateDatasource(KafkaDruidDataSourceTemplate.newInstance(datasourceVO));
         }
+
+        // 在infomap中启用
+        infoMap.regist(entity);
 
         return entity.getId();
     }
